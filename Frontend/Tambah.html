@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Warung Kopgiti</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(to right, #22d3ee, #60a5fa);
+    }
+    .container {
+      display: flex;
+    }
+    aside {
+      width: 250px;
+      background: linear-gradient(to right, #22d3ee, #60a5fa);
+      color: white;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    aside img {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    aside input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 16px;
+      border-radius: 4px;
+      border: none;
+    }
+    nav a {
+      display: block;
+      background-color: #d1d5db;
+      color: black;
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    main {
+      flex: 1;
+      padding: 24px;
+    }
+    .main-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .main-header h1 {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .main-header button {
+      background-color: #2563eb;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 4px;
+    }
+    .filter {
+      background-color: #bfdbfe;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+    .filter span {
+      font-weight: 600;
+    }
+    .filter button {
+      background-color: #3b82f6;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      border: none;
+      margin-left: 8px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 16px;
+      border-top: 8px solid #10b981;
+    }
+    .card.out-of-stock {
+      border-top-color: #ef4444;
+    }
+    .card .title {
+      font-weight: 600;
+    }
+    .card .actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 8px;
+      gap: 8px;
+    }
+    .card .actions button {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      color: white;
+    }
+    .btn-delete {
+      background-color: #ef4444;
+    }
+    .btn-edit {
+      background-color: #3b82f6;
+    }
+    .pagination {
+      margin-top: 24px;
+      text-align: center;
+    }
+    .pagination button {
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 6px 12px;
+      border-radius: 4px;
+      margin: 0 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <aside>
+      <img src="logo.png" alt="Logo">
+      <input type="text" placeholder="Search for anything...">
+      <nav>
+        <a href="#">Dashboard</a>
+        <a href="#">Data Barang</a>
+        <a href="#">Kelola Barang</a>
+        <a href="#">Profile</a>
+        <a href="#">Logout</a>
+      </nav>
+    </aside>
+
+    <main>
+  <div class="main-header">
+    <h1>Data Barang</h1>
+    <button onclick="showForm()">+ Tambah Barang</button>
+  </div>
+
+<!-- Form Tambah Barang -->
+<div id="form-container" style="display: none; margin-bottom: 24px;">
+  <div class="filter">
+    <h2 style="margin-bottom: 12px;">Tambah Barang Baru</h2>
+    <form id="add-item-form">
+      <input type="text" id="nama" placeholder="Nama Barang" required>
+      <input type="text" id="kode" placeholder="Kode Barang" required>
+      <input type="number" id="harga" placeholder="Harga Barang" required>
+      <input type="number" id="stok" placeholder="Stok Barang" required>
+      <button type="submit">Simpan</button>
+    </form>
+  </div>
+</div>
+
+
+
+      <div class="filter">
+        <div class="mb-2">
+          <span>Filter Kategori:</span>
+          <button>Semua</button>
+          <button>Kopi</button>
+          <button>Mie</button>
+        </div>
+        <div>
+          <span>Filter Ketersediaan:</span>
+          <button>Tersedia</button>
+          <button>Kosong</button>
+        </div>
+      </div>
+
+      <div class="grid" id="item-grid">
+        <div class="card">
+          <div class="title">Kopi Gooday</div>
+          <div>Kode: K01</div>
+          <div>Harga: Rp 5.000</div>
+          <div>Stok: 54</div>
+          <div class="actions">
+            <button class="btn-delete">🗑</button>
+            <button class="btn-edit">✏</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="title">Kopi ABC</div>
+          <div>Kode: K02</div>
+          <div>Harga: Rp 5.000</div>
+          <div>Stok: 32</div>
+          <div class="actions">
+            <button class="btn-delete">🗑</button>
+            <button class="btn-edit">✏</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="title">Kopi Kapal Api</div>
+          <div>Kode: K03</div>
+          <div>Harga: Rp 10.000</div>
+          <div>Stok: 45</div>
+          <div class="actions">
+            <button class="btn-delete">🗑</button>
+            <button class="btn-edit">✏</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="title">Mie Goreng</div>
+          <div>Kode: K04</div>
+          <div>Harga: Rp 10.000</div>
+          <div>Stok: 60</div>
+          <div class="actions">
+            <button class="btn-delete">🗑</button>
+            <button class="btn-edit">✏</button>
+          </div>
+        </div>
+
+        <div class="card out-of-stock">
+          <div class="title">Mie Ayam Bawang</div>
+          <div>Kode: K05</div>
+          <div>Harga: Rp 10.000</div>
+          <div>Stok: 0</div>
+          <div class="actions">
+            <button class="btn-delete">🗑</button>
+            <button class="btn-edit">✏</button>
+          </div>
+        </div>
+
+        <div class="card out-of-stock">
+          <div class="title">Mie Soto</div>
+          <div>Kode: K06</div>
+          <div>Harga: Rp 10.000</div>
+          <div>Stok: 0</div>
+          <div class="actions">
+            <button class="btn-delete">🗑</button>
+            <button class="btn-edit">✏</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pagination">
+        <button>1</button>
+        <button>2</button>
+        <button>&gt;</button>
+      </div>
+    </main>
+  </div>
+<script>
+  function showForm() {
+    document.getElementById('form-container').style.display = 'block';
+  }
+
+  document.getElementById('add-item-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const nama = document.getElementById('nama').value;
+    const kode = document.getElementById('kode').value;
+    const harga = document.getElementById('harga').value;
+    const stok = parseInt(document.getElementById('stok').value);
+
+    const card = document.createElement('div');
+    card.className = 'card' + (stok === 0 ? ' out-of-stock' : '');
+
+    card.innerHTML = `
+      <div class="title">${nama}</div>
+      <div>Kode: ${kode}</div>
+      <div>Harga: Rp ${parseInt(harga).toLocaleString()}</div>
+      <div>Stok: ${stok}</div>
+      <div class="actions">
+        <button class="btn-delete">🗑</button>
+        <button class="btn-edit">✏</button>
+      </div>
+    `;
+
+    document.getElementById('item-grid').appendChild(card);
+
+    // Reset & sembunyikan form
+    this.reset();
+    document.getElementById('form-container').style.display = 'none';
+  });
+</script>
+</body>
+</html>
