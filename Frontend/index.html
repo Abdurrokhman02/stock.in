@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stock.in — Data Barang</title>
+  <style>
+    /* (sama persis dengan CSS sebelumnya) */
+    body{margin:0;font-family:sans-serif;min-height:100vh;background:linear-gradient(to right,#22d3ee,#60a5fa)}
+    .container{display:flex}
+    aside{width:250px;background:linear-gradient(to right,#22d3ee,#60a5fa);color:#fff;padding:20px;min-height:100vh}
+    aside img{width:100%;margin-bottom:20px}
+    aside input{width:100%;padding:8px;margin-bottom:16px;border-radius:4px;border:none}
+    nav a{display:block;background:#d1d5db;color:#000;padding:10px;border-radius:4px;margin-bottom:8px;text-decoration:none;font-weight:600}
+    main{flex:1;padding:24px}
+    .main-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+    .main-header h1{font-size:24px;font-weight:700}
+    .main-header button{background:#2563eb;color:#fff;padding:10px 16px;border:none;border-radius:4px;cursor:pointer}
+    .filter{background:#bfdbfe;padding:16px;border-radius:8px;margin-bottom:24px}
+    .filter span{font-weight:600}
+    .filter button{background:#3b82f6;color:#fff;padding:6px 12px;border:none;border-radius:4px;margin-left:8px;cursor:pointer}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .card{background:#fff;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.1);padding:16px;border-top:8px solid #10b981}
+    .card.out-of-stock{border-top-color:#ef4444}
+    .card .title{font-weight:600}
+    .card .actions{display:flex;justify-content:flex-end;margin-top:8px;gap:8px}
+    .card .actions button{padding:6px 10px;border:none;border-radius:4px;color:#fff;cursor:pointer}
+    .btn-delete{background:#ef4444}
+    .btn-edit{background:#3b82f6}
+    input[type="text"],input[type="number"]{width:100%;padding:8px;margin-bottom:8px;border:1px solid #ccc;border-radius:4px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <aside>
+      <img src="logo.png" alt="Logo">
+      <input id="search" type="text" placeholder="Cari nama barang...">
+      <nav>
+        <a href="#">Dashboard</a>
+        <a href="#">Data Barang</a>
+        <a href="#">Kelola Barang</a>
+        <a href="#">Profile</a>
+        <a href="#">Logout</a>
+      </nav>
+    </aside>
+    <main>
+      <div class="main-header">
+        <h1>Data Barang</h1>
+        <button onclick="showForm()">+ Tambah Barang</button>
+      </div>
+      <div id="form-container" style="display:none;margin-bottom:24px">
+        <div class="filter">
+          <h2 style="margin-bottom:12px">Tambah / Edit Barang</h2>
+          <form id="item-form">
+            <input type="text" id="nama" placeholder="Nama Barang" required>
+            <input type="text" id="kode" placeholder="Kode Barang" required>
+            <input type="number" id="harga" placeholder="Harga Barang" required>
+            <input type="number" id="stok" placeholder="Stok Barang" required>
+            <button type="submit">Simpan</button>
+          </form>
+        </div>
+      </div>
+      <div class="filter">
+        <!-- (filter kategori & ketersediaan static) -->
+      </div>
+      <div class="grid" id="item-grid"></div>
+    </main>
+  </div>
+
+<script>
+  const API = 'http://localhost:3000/items';
+  let editingId = null;
+
+  // Tampilkan form
+  function showForm(edit = false, item = {}) {
+    document.getElementById('form-container').style.display = 'block';
+    if (edit) {
+      editingId = item.id;
+      document.getElementById('nama').value = item.nama;
+      document.getElementById('kode').value = item.kode;
+      document.getElementById('harga').value = item.harga;
+      document.getElementById('stok').value = item.stok;
+    } else {
+      editingId = null;
+      document.getElementById('item-form').reset();
+    }
+  }
+
+  // Render semua item
+  async function renderItems() {
+    const res = await fetch(API);
+    const items = await res.json();
+    const grid = document.getElementById('item-grid');
+    grid.innerHTML = '';
+    items.forEach(i => {
+      const card = document.createElement('div');
+      card.className = 'card' + (i.stok === 0 ? ' out-of-stock' : '');
+      card.innerHTML = `
+        <div class="title">${i.nama}</div>
+        <div>Kode: ${i.kode}</div>
+        <div>Harga: Rp ${i.harga.toLocaleString()}</div>
+        <div>Stok: ${i.stok}</div>
+        <div class="actions">
+          <button class="btn-delete" onclick="deleteItem(${i.id})">🗑</button>
+          <button class="btn-edit" onclick='showForm(true, ${JSON.stringify(i)})'>✏</button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  // Tambah atau edit item
+  document.getElementById('item-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const data = {
+      nama: e.target.nama.value,
+      kode: e.target.kode.value,
+      harga: parseInt(e.target.harga.value),
+      stok: parseInt(e.target.stok.value)
+    };
+    if (data.stok < 10) alert(`⚠ Stok ${data.nama} hampir habis!`);
+
+    if (editingId) {
+      await fetch(`${API}/${editingId}`, {
+        method: 'PUT',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+      });
+    } else {
+      await fetch(API, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+      });
+    }
+    document.getElementById('form-container').style.display = 'none';
+    renderItems();
+  });
+
+  // Hapus item
+  async function deleteItem(id) {
+    if (!confirm('Yakin ingin menghapus?')) return;
+    await fetch(`${API}/${id}`, { method: 'DELETE' });
+    renderItems();
+  }
+
+  // Inisialisasi
+  renderItems();
+</script>
+</body>
+</html>
